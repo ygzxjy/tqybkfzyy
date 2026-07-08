@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="高定版天气预报网页应用" />
+  <meta name="theme-color" content="#0a0e27" />
+  <title>听风 · 天气预报</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@200;300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0%25' stop-color='%23fffce8'/%3E%3Cstop offset='100%25' stop-color='%23ff8800'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='30' fill='url(%23g)'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- 流动渐变背景（按你给的色） -->
+  <div class="bg-gradient"></div>
+  <!-- 鼠标光斑（柔和版） -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+  <!-- 3D 视差层 -->
+  <div class="parallax-layer" id="parallaxLayer">
+    <div class="bg-mesh" id="bgMesh"></div>
+    <div class="bg-layer" id="bgLayer">
+      <div class="bg-orb bg-orb-1"></div>
+      <div class="bg-orb bg-orb-2"></div>
+      <div class="bg-orb bg-orb-3"></div>
+      <div class="bg-stars" id="bgStars"></div>
+      <div class="bg-clouds" id="bgClouds"></div>
+      <div class="bg-rain" id="bgRain"></div>
+      <div class="bg-snow" id="bgSnow"></div>
+    </div>
+  </div>
+
+  <main class="app" id="app">
+    <!-- 顶部 -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" id="brandMark"></span>
+        <div class="brand-text">
+          <h1 class="brand-title">听风</h1>
+          <p class="brand-sub">高定版</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="cmdBtn" title="命令面板 (⌘K)" aria-label="命令面板">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+          </svg>
+          <kbd>⌘K</kbd>
+        </button>
+        <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" id="locBtn" title="使用我的位置" aria-label="定位">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 搜索 -->
+    <section class="search">
+      <!-- 多城市 Dashboard -->
+      <div class="city-dashboard" id="cityDashboard">
+        <div class="city-list" id="cityList"></div>
+      </div>
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input id="cityInput" class="search-input" type="text" placeholder="搜索城市… 按 ⌘K 快速搜索"
+          autocomplete="off" spellcheck="false" />
+        <button id="searchBtn" class="search-btn" aria-label="搜索">搜索</button>
+      </div>
+      <div class="suggestions" id="suggestions"></div>
+      <div class="recent" id="recent"></div>
+    </section>
+
+    <!-- 错误 -->
+    <div class="error" id="error" hidden>
+      <span class="error-icon">⚠️</span>
+      <p id="errorText"></p>
+    </div>
+
+    <!-- 骨架屏 -->
+    <div class="skeleton" id="skeleton" hidden>
+      <div class="sk-hero">
+        <div class="sk-line sk-line-lg"></div>
+        <div class="sk-line sk-line-sm"></div>
+        <div class="sk-temp"></div>
+        <div class="sk-line sk-line-md"></div>
+      </div>
+      <div class="sk-card sk-card-h"></div>
+      <div class="sk-card"></div>
+      <div class="sk-card"></div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="content" id="content" hidden>
+      <!-- AI 天气摘要 -->
+      <div class="insight" id="insight">
+        <div class="insight-icon" id="insightIcon"></div>
+        <div class="insight-text" id="insightText">加载中…</div>
+      </div>
+
+      <!-- 天气预警 -->
+      <div class="warnings" id="warnings" hidden></div>
+
+      <!-- Hero 当前天气 -->
+      <section class="hero" id="heroCard">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-content">
+          <div class="hero-top">
+            <div class="hero-loc">
+              <h2 class="city" id="cityName">—</h2>
+              <p class="time">
+                <span class="time-dot"></span>
+                <span id="updateTime">—</span>
+                <button class="refresh-btn" id="refreshBtn" title="手动刷新" aria-label="刷新">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M16 16h5v5"/>
+                  </svg>
+                </button>
+              </p>
+            </div>
+            <div class="hero-icon-3d" id="heroIcon"></div>
+          </div>
+          <div class="hero-temp">
+            <span class="temp" id="currentTemp">--</span>
+            <span class="temp-unit" id="tempUnit">°</span>
+          </div>
+          <div class="hero-foot">
+            <p class="desc" id="weatherDesc">—</p>
+            <div class="hi-lo">
+              <span class="chip-stat">↑ <b id="tempMax">--</b>°</span>
+              <span class="chip-stat">↓ <b id="tempMin">--</b>°</span>
+              <span class="chip-stat">体感 <b id="feelsQuick">--</b>°</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 今日 vs 昨日 -->
+      <section class="card compare-card" id="compareCard" hidden>
+        <h3 class="card-title">对比昨日</h3>
+        <div class="compare-grid">
+          <div class="compare-cell">
+            <div class="compare-label">今天</div>
+            <div class="compare-icon" id="compareTodayIcon"></div>
+            <div class="compare-temp" id="compareTodayTemp">--</div>
+          </div>
+          <div class="compare-arrow" id="compareArrow">→</div>
+          <div class="compare-cell">
+            <div class="compare-label">昨天</div>
+            <div class="compare-icon" id="compareYesterdayIcon"></div>
+            <div class="compare-temp" id="compareYesterdayTemp">--</div>
+          </div>
+        </div>
+        <div class="compare-text" id="compareText">—</div>
+      </section>
+
+      <!-- 太阳弧 -->
+      <section class="card sun-arc">
+        <div class="sun-arc-head">
+          <h3 class="card-title">日出日落</h3>
+          <div class="sun-arc-extras">
+            <span class="moon-info" id="moonInfo">🌔</span>
+            <span class="sun-countdown" id="sunCountdown">—</span>
+          </div>
+        </div>
+        <div class="sun-arc-time">
+          <span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg> <b id="sunrise">--:--</b></span>
+          <span><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="2" y1="18" x2="22" y2="18"/></svg> <b id="sunset">--:--</b></span>
+        </div>
+        <div class="sun-arc-svg-wrap">
+          <svg class="sun-arc-svg" viewBox="0 0 320 110" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ffb84d"/>
+                <stop offset="50%" stop-color="#ffd93d"/>
+                <stop offset="100%" stop-color="#ff7a5a"/>
+              </linearGradient>
+              <radialGradient id="sunCore">
+                <stop offset="0%" stop-color="#fffce8"/>
+                <stop offset="50%" stop-color="#ffd93d"/>
+                <stop offset="100%" stop-color="#ff8800"/>
+              </radialGradient>
+              <linearGradient id="arcFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,217,61,0.35)"/>
+                <stop offset="100%" stop-color="rgba(255,217,61,0)"/>
+              </linearGradient>
+            </defs>
+            <line x1="10" y1="100" x2="310" y2="100" stroke="rgba(255,255,255,0.15)" stroke-dasharray="2 4" stroke-width="1"/>
+            <path d="M 20 100 Q 160 -20 300 100" stroke="url(#arcGrad)" stroke-width="2" fill="none" opacity="0.7"/>
+            <path id="arcFillPath" d="M 20 100 Q 160 -20 300 100 L 300 100 L 20 100 Z" fill="url(#arcFill)" opacity="0.5"/>
+            <g id="sunOrb">
+              <circle r="16" fill="url(#arcGrad)" opacity="0.2" class="sun-glow"/>
+              <circle r="11" fill="url(#arcGrad)" opacity="0.3" class="sun-glow-2"/>
+              <circle r="7" fill="url(#sunCore)" class="sun-core"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 24h 图表 -->
+      <section class="card chart-card">
+        <div class="chart-head">
+          <h3 class="card-title">未来 24 小时</h3>
+          <div class="chart-legend">
+            <span class="legend-temp">温度</span>
+            <span class="legend-rain">降水</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg id="tempChart" class="temp-chart" viewBox="0 0 600 140" preserveAspectRatio="none"></svg>
+          <div class="chart-axis" id="chartAxis"></div>
+        </div>
+      </section>
+
+      <!-- 详细数据 -->
+      <section class="card details-card">
+        <h3 class="card-title">详细数据</h3>
+        <div class="details-grid">
+          <div class="detail-cell"><div class="detail-label">湿度</div><div class="detail-value" id="humidity">--%</div><div class="detail-bar"><div class="detail-bar-fill" id="humidityBar" style="width:0%"></div></div></div>
+          <div class="detail-cell">
+            <div class="detail-label">风</div>
+            <div class="detail-compass">
+              <svg viewBox="0 0 60 60" class="compass-svg">
+                <defs>
+                  <linearGradient id="compassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                    <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="30" cy="30" r="26" fill="url(#compassGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+                <text x="30" y="11" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)" font-weight="600">N</text>
+                <text x="30" y="56" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)" font-weight="600">S</text>
+                <text x="6" y="33" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)" font-weight="600">W</text>
+                <text x="54" y="33" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.5)" font-weight="600">E</text>
+                <g id="windArrow" style="transform-origin: 30px 30px;">
+                  <path d="M 30 14 L 26 22 L 30 19 L 34 22 Z" fill="#ffd93d"/>
+                </g>
+              </svg>
+            </div>
+            <div class="detail-value-sm" id="wind">--</div>
+            <div class="detail-sub" id="windDir">—</div>
+          </div>
+          <div class="detail-cell"><div class="detail-label">体感</div><div class="detail-value" id="feelsLike">--°</div><div class="detail-sub" id="feelsDiff">—</div></div>
+          <div class="detail-cell"><div class="detail-label">紫外线</div><div class="detail-value" id="uv">--</div><div class="detail-sub" id="uvHint">—</div></div>
+          <div class="detail-cell"><div class="detail-label">能见度</div><div class="detail-value" id="visibility">--</div><div class="detail-sub" id="visHint">—</div></div>
+          <div class="detail-cell"><div class="detail-label">气压</div><div class="detail-value" id="pressure">--</div><div class="detail-sub">hPa</div></div>
+        </div>
+      </section>
+
+      <!-- AQI 圆形仪表盘 -->
+      <section class="card aqi-card" id="aqiCard" hidden>
+        <div class="aqi-head">
+          <h3 class="card-title">空气质量</h3>
+          <div class="aqi-source">Open-Meteo</div>
+        </div>
+        <div class="aqi-body">
+          <div class="aqi-gauge">
+            <svg viewBox="0 0 200 120" class="gauge-svg">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#4caf50"/>
+                  <stop offset="25%" stop-color="#cddc39"/>
+                  <stop offset="50%" stop-color="#ffc107"/>
+                  <stop offset="75%" stop-color="#ff9800"/>
+                  <stop offset="100%" stop-color="#f44336"/>
+                </linearGradient>
+                <filter id="gaugeGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <path d="M 20 100 A 80 80 0 0 1 180 100" stroke="rgba(255,255,255,0.08)" stroke-width="10" fill="none" stroke-linecap="round"/>
+              <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" stroke="url(#gaugeGrad)" stroke-width="10" fill="none" stroke-linecap="round" filter="url(#gaugeGlow)"/>
+              <g id="gaugeNeedle" style="transform-origin: 100px 100px;">
+                <line x1="100" y1="100" x2="100" y2="40" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="100" cy="100" r="5" fill="white"/>
+                <circle cx="100" cy="100" r="3" fill="#ffd93d"/>
+              </g>
+            </svg>
+            <div class="gauge-num" id="aqiNum">--</div>
+            <div class="gauge-label" id="aqiLabel">—</div>
+          </div>
+          <div class="aqi-detail">
+            <div class="aqi-row"><span>PM2.5</span><b id="aqiPm25">—</b></div>
+            <div class="aqi-row"><span>PM10</span><b id="aqiPm10">—</b></div>
+            <div class="aqi-row"><span>臭氧 O₃</span><b id="aqiO3">—</b></div>
+            <div class="aqi-tip" id="aqiTip">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 天预报 -->
+      <section class="card forecast-card">
+        <h3 class="card-title">未来 7 天</h3>
+        <div class="forecast-list" id="forecastList"></div>
+      </section>
+
+      <!-- 生活指数 -->
+      <section class="card life-card" id="lifeCard" hidden>
+        <h3 class="card-title">生活指数</h3>
+        <div class="life-grid" id="lifeGrid"></div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <p>听风 · 数据 · Open-Meteo · BigDataCloud</p>
+    </footer>
+  </main>
+
+  <!-- 命令面板 -->
+  <div class="cmd-palette" id="cmdPalette" hidden>
+    <div class="cmd-backdrop" id="cmdBackdrop"></div>
+    <div class="cmd-modal">
+      <div class="cmd-input-wrap">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input id="cmdInput" class="cmd-input" placeholder="搜索城市或执行命令…" />
+        <kbd class="cmd-kbd">ESC</kbd>
+      </div>
+      <div class="cmd-results" id="cmdResults"></div>
+      <div class="cmd-footer">
+        <span><kbd>↑↓</kbd> 选择</span>
+        <span><kbd>↵</kbd> 确认</span>
+        <span><kbd>ESC</kbd> 关闭</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 设置抽屉 -->
+  <div class="settings-drawer" id="settingsDrawer" hidden>
+    <div class="settings-backdrop" id="settingsBackdrop"></div>
+    <div class="settings-panel">
+      <div class="settings-head">
+        <h2>设置</h2>
+        <button class="icon-btn" id="closeSettings" aria-label="关闭">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-section">
+          <h3>单位</h3>
+          <div class="settings-row">
+            <span>温度单位</span>
+            <div class="settings-toggle" id="unitToggle">
+              <button class="opt active" data-unit="c">°C</button>
+              <button class="opt" data-unit="f">°F</button>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>外观</h3>
+          <div class="settings-row">
+            <span>动效</span>
+            <div class="settings-switch" id="animSwitch" data-on="true">
+              <div class="switch-handle"></div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span>3D 视差</span>
+            <div class="settings-switch" id="parallaxSwitch" data-on="true">
+              <div class="switch-handle"></div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <span>环境音</span>
+            <div class="settings-switch" id="soundSwitch" data-on="false">
+              <div class="switch-handle"></div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>数据</h3>
+          <div class="settings-row">
+            <span>自动刷新</span>
+            <select id="refreshSelect" class="settings-select">
+              <option value="0">关闭</option>
+              <option value="30">30秒</option>
+              <option value="60">1分钟</option>
+              <option value="300">5分钟</option>
+              <option value="600">10分钟</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>关于</h3>
+          <div class="settings-about">
+            <p>Weather · v8 极致版</p>
+            <p style="opacity:0.6;font-size:12px;margin-top:4px">数据 · Open-Meteo · BigDataCloud</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=8" defer></script>
+</body>
+</html>
